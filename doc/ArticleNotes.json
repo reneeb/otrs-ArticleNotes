@@ -1,0 +1,20 @@
+{
+    "name": "ArticleNotes",
+    "version": "4.0.1",
+    "framework": [
+        "4.0.x"
+    ],
+    "vendor": {
+        "name":  "Perl-Services.de",
+        "url": "http://www.perl-services.de"
+    },
+    "license": "GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007",
+    "description" : {
+        "en": "Change article note",
+        "de": "Artikelnotiz ändern"
+    },
+    "code": [
+        { "type": "Install", "version": 0 },
+        { "type": "Upgrade", "version": 0 }
+    ]
+}
