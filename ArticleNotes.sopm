@@ -2,15 +2,18 @@
 <otrs_package version="1.0">
     <!-- GENERATED WITH OTRS::OPM::Maker::Command::sopm (1.33) -->
     <Name>ArticleNotes</Name>
-    <Version>5.0.1</Version>
+    <Version>5.0.2</Version>
     <Framework>5.0.x</Framework>
     <Vendor>Perl-Services.de</Vendor>
     <URL>http://www.perl-services.de</URL>
-    <Description Lang="de">Artikelnotiz ändern</Description>
-    <Description Lang="en">Change article note</Description>
+    <Description Lang="de">Artikelnotiz ändern.</Description>
+    <Description Lang="en">Change article note.</Description>
+    <Description Lang="hu">Bejegyzés jegyzetének megváltoztatása.</Description>
     <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
     <Filelist>
         <File Permission="644" Location="Kernel/Config/Files/ArticleNotes.xml" />
+        <File Permission="644" Location="Kernel/Language/de_ArticleNotes.pm" />
+        <File Permission="644" Location="Kernel/Language/hu_ArticleNotes.pm" />
         <File Permission="644" Location="Kernel/Modules/AgentArticleNote.pm" />
         <File Permission="644" Location="Kernel/Output/HTML/FilterContent/ArticleNotesIcons.pm" />
         <File Permission="644" Location="Kernel/Output/HTML/FilterElementPost/ArticleNotes.pm" />
