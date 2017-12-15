@@ -33,11 +33,12 @@ sub new {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $LayoutObject  = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
-    my $JSONObject    = $Kernel::OM->Get('Kernel::System::JSON');
-    my $ArticleObject = $Kernel::OM->Get('Kernel::System::Ticket::Article');
-    my $ConfigObject  = $Kernel::OM->Get('Kernel::Config');
-    my $ParamObject   = $Kernel::OM->Get('Kernel::System::Web::Request');
+    my $LayoutObject   = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+    my $JSONObject     = $Kernel::OM->Get('Kernel::System::JSON');
+    my $ArticleObject  = $Kernel::OM->Get('Kernel::System::Ticket::Article');
+    my $ConfigObject   = $Kernel::OM->Get('Kernel::Config');
+    my $LanguageObject = $Kernel::OM->Get('Kernel::Language');
+    my $ParamObject    = $Kernel::OM->Get('Kernel::System::Web::Request');
 
     my $TicketID = $ParamObject->GetParam( Param => 'TicketID' );
 
@@ -46,7 +47,8 @@ sub Run {
     my %ArticlesWithNotes;
     my %ArticlesNotes;
 
-    my $Name = $ConfigObject->Get('ArticleNotes::Field') || 'ArticleNote';
+    my $Name  = $ConfigObject->Get('ArticleNotes::Field') || 'ArticleNote';
+    my $Title = $LanguageObject->Translate('Note');
 
     for my $ArticleID ( @ArticleIDs ) {
         my $BackendObject = $ArticleObject->BackendForArticle(
@@ -75,15 +77,53 @@ sub Run {
 
     my $Code = qq~
         <script type="text/javascript">//<![CDATA[
+        function PSArticleNotesShow( ArticleID, Event ) {
+            var ArticleNotes = $NotesJSON;
+
+            var PosX = 0;
+            var PosY = 0;
+
+            var jsEvent = Event || window.event;
+            if (jsEvent.pageX || jsEvent.pageY) {
+
+                PosX = jsEvent.pageX;
+                PosY = jsEvent.pageY;
+            }
+            else if (jsEvent.clientX || jsEvent.clientY) {
+
+                PosX = jsEvent.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+                PosY = jsEvent.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+            }
+
+            // increase X position to don't be overlapped by mouse pointer
+            PosX = PosX + 15;
+
+            var Note = ArticleNotes[ArticleID];
+            var Layer = '<div id="events-layer" class="Hidden" style="position:absolute; top: ' + PosY + 'px; left:' + PosX + 'px; z-index: 999;"> ' +
+                '    <div style="z-index: 5; background-color: #EEE; border: 1px solid #CCC; padding: 6px"><h2>$Title</h2><code>' +
+                         Note +
+                '    </code></div> ' +
+                '</div> ';
+
+            \$(Layer).appendTo('body');
+            \$('#events-layer').fadeIn('fast');
+        }
+
         Core.App.Ready( function() {
             var ArticlesWithNotes = $JSON;
-            var ArticleNotes     = $NotesJSON;
             \$('input[class="ArticleID"]').each( function() {
                 var ArticleID = \$(this).val();
 
                 if( ArticlesWithNotes[ArticleID] == 1 ) {
-                    var Title = ArticleNotes[ArticleID];
-                    \$(this).parent().append( '<span class="fa fa-exclamation-circle" title="' + Title + '"></span>' );
+                    var Span = \$( '<span class="fa fa-exclamation-circle"></span>' );
+                    \$(this).parent().append( Span );
+
+                    Span.bind('mouseover', function( event ) {
+                        PSArticleNotesShow( ArticleID, event );
+                    }).bind( 'mouseout', function() {
+                        \$('#events-layer').fadeOut('fast');
+                        \$('#events-layer').remove();
+                    });
                 }
             });
         });
