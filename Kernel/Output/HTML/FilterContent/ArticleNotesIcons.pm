@@ -41,6 +41,7 @@ sub Run {
     my @ArticleIDs = ${ $Param{Data} } =~ m{<input \s+ type="hidden" \s+ class="ArticleID" \s+ value="([^"]+)"}xmsg;
 
     my %ArticlesWithNotes;
+    my %ArticlesNotes;
 
     my $Name = $ConfigObject->Get('ArticleNotes::Field') || 'ArticleNote';
 
@@ -53,17 +54,22 @@ sub Run {
 
         if ( $Article{"DynamicField_$Name"} ) {
             $ArticlesWithNotes{$ArticleID} = 1;
+            $ArticlesNotes{$ArticleID} = $Article{"DynamicField_$Name"};
         }
     }
 
-    my $JSON = $JSONObject->Encode( Data => \%ArticlesWithNotes );
+    my $JSON      = $JSONObject->Encode( Data => \%ArticlesWithNotes );
+    my $NotesJSON = $JSONObject->Encode( Data => \%ArticlesNotes );
+
     my $Code = qq~
         var ArticlesWithNotes = $JSON;
+        var ArticlesNotes     = $NotesJSON;
         \$('input[class="ArticleID"]').each( function() {
             var ArticleID = \$(this).val();
 
             if( ArticlesWithNotes[ArticleID] == 1 ) {
-                \$(this).parent().append( '<span class="fa fa-exclamation-circle"></span>' );
+                var Title = ArticleNotes[ArticleID];
+                \$(this).parent().append( '<span class="fa fa-exclamation-circle" title="' + Title + '"></span>' );
             }
         });
     ~;
