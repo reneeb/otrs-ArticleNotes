@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2016 Perl-Services.de, http://perl-services.de
+# Copyright (C) 2016 - 2017 Perl-Services.de, http://perl-services.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -50,30 +50,6 @@ sub new {
     # allocate new hash for object
     my $Self = {};
     bless( $Self, $Type );
-
-    # create needed sysconfig object
-    my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
-
-    # rebuild ZZZ* files
-    $SysConfigObject->WriteDefault();
-
-    # define the ZZZ files
-    my @ZZZFiles = (
-        'ZZZAAuto.pm',
-        'ZZZAuto.pm',
-    );
-
-    # reload the ZZZ files (mod_perl workaround)
-    for my $ZZZFile (@ZZZFiles) {
-
-        PREFIX:
-        for my $Prefix (@INC) {
-            my $File = $Prefix . '/Kernel/Config/Files/' . $ZZZFile;
-            next PREFIX if !-f $File;
-            do $File;
-            last PREFIX;
-        }
-    }
 
     return $Self;
 }

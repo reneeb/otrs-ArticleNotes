@@ -15,9 +15,7 @@ our @ObjectDependencies = qw(
     Kernel::Language
     Kernel::Output::HTML::Layout
     Kernel::System::Web::Request
-    Kernel::Config
-    Kernel::System::Ticket
-    Kernel::System::Log
+    Kernel::System::Ticket::Article
 );
 
 sub new {
@@ -36,38 +34,45 @@ sub Run {
     my $LanguageObject = $Kernel::OM->Get('Kernel::Language');
     my $LayoutObject   = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
     my $ParamObject    = $Kernel::OM->Get('Kernel::System::Web::Request');
-    my $JSONObject     = $Kernel::OM->Get('Kernel::System::JSON');
+    my $ArticleObject  = $Kernel::OM->Get('Kernel::System::Ticket::Article');
 
     my $Title    = $LanguageObject->Translate('Article Note');
     my $Baselink = $LayoutObject->{Baselink};
     my $TicketID = $ParamObject->GetParam( Param => 'TicketID' );
 
-    ${ $Param{Data} } =~ s{
-        ( <a \s name="Article(\d+)" .*? <ul \s class="Actions"> ) \s+ <li>
-    }{
-        $1 . $Self->__Linkify( $Baselink, $TicketID, $2, $Title ) . '<li>';
-    }exmsg;
-
-    return 1;
-}
-
-sub __Linkify {
-    my ($Self, $Baselink, $TicketID, $ArticleID, $Title, $HashRef ) = @_;
-
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-
-    my %Article = $TicketObject->ArticleGet(
-        ArticleID => $ArticleID,
-        UserID    => $Self->{UserID},
+    my @Articles = $ArticleObject->ArticleList(
+        TicketID => $TicketID,
     );
 
-    my $Link = qq~
-        <li class="ArticleNote">
-            <a href="${Baselink}Action=AgentArticleNote;TicketID=$TicketID;ArticleID=$ArticleID" title="$Title" class="AsPopup Popup_Type_TicketAction">$Title</a>
-        </li>
-    ~;
+    for my $Article ( @Articles ) {
+        my $ArticleID = $Article->{ArticleID};
 
-    return $Link;
+        my $BackendObject = $ArticleObject->BackendForArticle(
+            ArticleID => $ArticleID,
+            TicketID  => $TicketID,
+        );
+
+        my %Article = $BackendObject->ArticleGet(
+            ArticleID => $ArticleID,
+            TicketID  => $TicketID,
+            UserID    => $Self->{UserID},
+        );
+
+        my $Link = qq~
+            <li class="ArticleNote">
+                <a href="${Baselink}Action=AgentArticleNote;TicketID=$TicketID;ArticleID=$ArticleID" title="$Title" class="AsPopup Popup_Type_TicketAction">$Title</a>
+            </li>
+        ~;
+
+        ${ $Param{Data} } =~ s{
+            <a \s+ name="Article $ArticleID" .*?
+            <ul \s+ class="Actions"> \K
+        }{
+            $Link
+        }xms;
+    }
+
+    return 1;
 }
 
 1;

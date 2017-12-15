@@ -29,6 +29,7 @@ sub Run {
     my $LayoutObject       = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
     my $ParamObject        = $Kernel::OM->Get('Kernel::System::Web::Request');
     my $TicketObject       = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $ArticleObject      = $Kernel::OM->Get('Kernel::System::Ticket::Article');
     my $ConfigObject       = $Kernel::OM->Get('Kernel::Config');
     my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
     my $BackendObject      = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
@@ -61,8 +62,14 @@ sub Run {
         }
     }
 
-    my %Article = $TicketObject->ArticleGet(
+    my $ArticleBackend = $ArticleObject->BackendForArticle(
+        ArticleID => $GetParam{ArticleID},
+        TicketID  => $GetParam{TicketID},
+    );
+
+    my %Article = $ArticleBackend->ArticleGet(
         ArticleID     => $GetParam{ArticleID},
+        TicketID      => $GetParam{TicketID},
         DynamicFields => 1,
         UserID        => $Self->{UserID},
     );
