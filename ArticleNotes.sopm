@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <otrs_package version="1.0">
-    <!-- GENERATED WITH OTRS::OPM::Maker::Command::sopm (1.33) -->
+    <!-- GENERATED WITH OTRS::OPM::Maker::Command::sopm (1.4) -->
     <Name>ArticleNotes</Name>
-    <Version>5.0.2</Version>
+    <Version>5.0.3</Version>
     <Framework>5.0.x</Framework>
     <Vendor>Perl-Services.de</Vendor>
     <URL>http://www.perl-services.de</URL>
@@ -15,8 +15,8 @@
         <File Permission="644" Location="Kernel/Language/de_ArticleNotes.pm" />
         <File Permission="644" Location="Kernel/Language/hu_ArticleNotes.pm" />
         <File Permission="644" Location="Kernel/Modules/AgentArticleNote.pm" />
+        <File Permission="644" Location="Kernel/Output/HTML/FilterContent/ArticleNotes.pm" />
         <File Permission="644" Location="Kernel/Output/HTML/FilterContent/ArticleNotesIcons.pm" />
-        <File Permission="644" Location="Kernel/Output/HTML/FilterElementPost/ArticleNotes.pm" />
         <File Permission="644" Location="Kernel/Output/HTML/Templates/Standard/AgentArticleNote.tt" />
         <File Permission="644" Location="doc/ArticleNotes.json" />
         <File Permission="644" Location="var/packagesetup/ArticleNotes.pm" />
