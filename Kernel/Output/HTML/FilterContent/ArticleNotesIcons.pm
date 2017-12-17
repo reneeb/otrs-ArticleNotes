@@ -100,9 +100,9 @@ sub Run {
 
             var Note = ArticleNotes[ArticleID];
             var Layer = '<div id="events-layer" class="Hidden" style="position:absolute; top: ' + PosY + 'px; left:' + PosX + 'px; z-index: 999;"> ' +
-                '    <div style="z-index: 5; background-color: #EEE; border: 1px solid #CCC; padding: 6px"><h2>$Title</h2><code>' +
+                '    <div style="z-index: 5; background-color: #EEE; border: 1px solid #CCC; padding: 6px"><h2>$Title</h2><pre>' +
                          Note +
-                '    </code></div> ' +
+                '    </pre></div> ' +
                 '</div> ';
 
             \$(Layer).appendTo('body');

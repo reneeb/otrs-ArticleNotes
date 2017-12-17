@@ -1,12 +1,12 @@
 # --
-# Copyright (C) 2016 Perl-Services.de, http://perl-services.de
+# Copyright (C) 2016 - 2017 Perl-Services.de, http://perl-services.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::Output::HTML::FilterElementPost::ArticleNotes;
+package Kernel::Output::HTML::FilterContent::ArticleNotes;
 
 use strict;
 use warnings;
@@ -44,8 +44,11 @@ sub Run {
         TicketID => $TicketID,
     );
 
+    ARTICLE:
     for my $Article ( @Articles ) {
         my $ArticleID = $Article->{ArticleID};
+
+        next ARTICLE if ${ $Param{Data} } =~ m{Action=AgentArticleNote;TicketID=$TicketID;ArticleID=$ArticleID};
 
         my $BackendObject = $ArticleObject->BackendForArticle(
             ArticleID => $ArticleID,
