@@ -36,6 +36,10 @@ sub Run {
     my $ParamObject    = $Kernel::OM->Get('Kernel::System::Web::Request');
     my $ArticleObject  = $Kernel::OM->Get('Kernel::System::Ticket::Article');
 
+    my $Action = $ParamObject->GetParam( Param => 'Action' ) // 'AgentDashboard';
+
+    return 1 if !$Param{Templates}->{$Action};
+
     my $Title    = $LanguageObject->Translate('Article Note');
     my $Baselink = $LayoutObject->{Baselink};
     my $TicketID = $ParamObject->GetParam( Param => 'TicketID' );
