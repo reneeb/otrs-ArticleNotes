@@ -44,6 +44,8 @@ sub Run {
 
     my @ArticleIDs = ${ $Param{Data} } =~ m{<input \s+ type="hidden" \s+ class="ArticleID" \s+ value="([^"]+)"}xmsg;
 
+    return 1 if !@ArticleIDs;
+
     my %ArticlesWithNotes;
     my %ArticlesNotes;
 
