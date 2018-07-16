@@ -81,4 +81,17 @@
             <Item ValueType="String" ValueRegex="">ArticleNote</Item>
         </Value>
     </Setting>
+    <Setting Name="Loader::Module::AgentTicketZoom###005-ArticleNotes" Required="0" Valid="1">
+        <Description Translatable="1">Loader module registration for the agent interface.</Description>
+        <Navigation>Frontend::Agent::ModuleRegistration::Loader</Navigation>
+        <Value>
+            <Hash>
+                <Item Key="JavaScript">
+                    <Array>
+                        <Item>PS.ArticleNotes.js</Item>
+                    </Array>
+                </Item>
+            </Hash>
+        </Value>
+    </Setting>
 </otrs_config>
