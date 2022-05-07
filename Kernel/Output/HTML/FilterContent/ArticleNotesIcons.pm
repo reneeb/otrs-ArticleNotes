@@ -33,19 +33,33 @@ sub new {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
-    my $JSONObject   = $Kernel::OM->Get('Kernel::System::JSON');
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $LayoutObject   = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+    my $JSONObject     = $Kernel::OM->Get('Kernel::System::JSON');
+    my $ArticleObject  = $Kernel::OM->Get('Kernel::System::Ticket::Article');
+    my $ConfigObject   = $Kernel::OM->Get('Kernel::Config');
+    my $LanguageObject = $Kernel::OM->Get('Kernel::Language');
+    my $ParamObject    = $Kernel::OM->Get('Kernel::System::Web::Request');
+
+    my $TicketID = $ParamObject->GetParam( Param => 'TicketID' );
 
     my @ArticleIDs = ${ $Param{Data} } =~ m{<input \s+ type="hidden" \s+ class="ArticleID" \s+ value="([^"]+)"}xmsg;
 
-    my %ArticlesWithNotes;
+    return 1 if !@ArticleIDs;
 
-    my $Name = $ConfigObject->Get('ArticleNotes::Field') || 'ArticleNote';
+    my %ArticlesWithNotes;
+    my %ArticlesNotes;
+
+    my $Name  = $ConfigObject->Get('ArticleNotes::Field') || 'ArticleNote';
+    my $Title = $LanguageObject->Translate('Note');
 
     for my $ArticleID ( @ArticleIDs ) {
-        my %Article = $TicketObject->ArticleGet(
+        my $BackendObject = $ArticleObject->BackendForArticle(
+            TicketID  => $TicketID,
+            ArticleID => $ArticleID,
+        );
+
+        my %Article = $BackendObject->ArticleGet(
+            TicketID      => $TicketID,
             ArticleID     => $ArticleID,
             DynamicFields => 1,
             UserID        => $Self->{UserID},
@@ -53,22 +67,25 @@ sub Run {
 
         if ( $Article{"DynamicField_$Name"} ) {
             $ArticlesWithNotes{$ArticleID} = 1;
+            $ArticlesNotes{$ArticleID} = $LayoutObject->Output(
+                Template => '[% Data.Text | html %]',
+                Data     => { Text => $Article{"DynamicField_$Name"} },
+            );
         }
     }
 
-    my $JSON = $JSONObject->Encode( Data => \%ArticlesWithNotes );
-    my $Code = qq~
-        var ArticlesWithNotes = $JSON;
-        \$('input[class="ArticleID"]').each( function() {
-            var ArticleID = \$(this).val();
+    my $JSON      = $JSONObject->Encode( Data => \%ArticlesWithNotes );
+    my $NotesJSON = $JSONObject->Encode( Data => \%ArticlesNotes );
 
-            if( ArticlesWithNotes[ArticleID] == 1 ) {
-                \$(this).parent().append( '<span class="fa fa-exclamation-circle"></span>' );
-            }
-        });
+    my $Code = qq~
+        <script type="text/javascript">//<![CDATA[
+            var ArticleNotes      = $NotesJSON;
+            var NotesTitle        = "$Title";
+            var ArticlesWithNotes = $JSON;
+        //]]></script>
     ~;
 
-    ${ $Param{Data} } =~ s{Core\.App\.Ready.*?\{\K}{$Code};
+    ${ $Param{Data} } =~ s{</head>}{$Code</head>};
 
     return 1;
 }

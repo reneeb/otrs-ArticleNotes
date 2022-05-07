@@ -51,30 +51,6 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    # create needed sysconfig object
-    my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
-
-    # rebuild ZZZ* files
-    $SysConfigObject->WriteDefault();
-
-    # define the ZZZ files
-    my @ZZZFiles = (
-        'ZZZAAuto.pm',
-        'ZZZAuto.pm',
-    );
-
-    # reload the ZZZ files (mod_perl workaround)
-    for my $ZZZFile (@ZZZFiles) {
-
-        PREFIX:
-        for my $Prefix (@INC) {
-            my $File = $Prefix . '/Kernel/Config/Files/' . $ZZZFile;
-            next PREFIX if !-f $File;
-            do $File;
-            last PREFIX;
-        }
-    }
-
     return $Self;
 }
 
